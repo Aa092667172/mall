@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -31,5 +32,19 @@ public class ProductController {
         Product product = productService.getProductById(productId);
         return status(HttpStatus.CREATED).body(product);
     }
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
+                                                 @RequestBody @Valid ProductRequest productRequest){
+        //檢查是否存在
+        Product product = productService.getProductById(productId);
+        if(Objects.isNull(product)){
+            return status(HttpStatus.NOT_FOUND).build();
+        }
 
+        productService.updateProduct(productId,productRequest);
+
+        Product updateProduct = productService.getProductById(productId);
+
+        return status(HttpStatus.OK).body(updateProduct);
+    }
 }

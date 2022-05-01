@@ -11,16 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+import static org.springframework.http.ResponseEntity.*;
+
 @RestController
 public class ProductController {
     @Autowired
     private ProductService productService;
+
     @GetMapping("/products/{productId}")
-    public ResponseEntity<Product> getProduct(@PathVariable Integer productId){
+    public ResponseEntity<Product> getProduct(@PathVariable Integer productId) {
         Product product = productService.getProductById(productId);
-        return Optional.ofNullable(product).map(p -> {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(p);
-        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return Optional.ofNullable(product)
+                .map(status(HttpStatus.OK)::body)
+                .orElse(status(HttpStatus.NOT_FOUND).build());
     }
 }

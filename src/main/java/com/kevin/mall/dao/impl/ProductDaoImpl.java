@@ -1,5 +1,6 @@
 package com.kevin.mall.dao.impl;
 
+import com.kevin.mall.constant.ProductCategory;
 import com.kevin.mall.dao.ProductDao;
 import com.kevin.mall.dto.ProductRequest;
 import com.kevin.mall.model.Product;
@@ -11,10 +12,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ProductDaoImpl implements ProductDao {
@@ -22,11 +20,24 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<Product> getProducts() {
-        String sql = "select product_id,product_name, category, image_url, price, stock," +
+    public List<Product> getProducts(ProductCategory productCategory,String search) {
+        StringBuilder sqlBuilder = new StringBuilder("select product_id,product_name, category, image_url, price, stock," +
                 " description, created_date, last_modified_date " +
-                "from product ";
-        return namedParameterJdbcTemplate.query(sql, new HashMap<String, Object>(),new ProductRowMapper());
+                "from product where 1 = 1 ");
+
+        Map<String, Object> map = new HashMap<>();
+
+        if(Objects.nonNull(productCategory)){
+            sqlBuilder.append(" and category = :category ");
+            map.put("category",productCategory.name());
+        }
+
+        if(Objects.nonNull(search)){
+            sqlBuilder.append(" and product_name like :search ");
+            map.put("search","%"+search+"%");
+        }
+
+        return namedParameterJdbcTemplate.query(sqlBuilder.toString(), map,new ProductRowMapper());
     }
 
     @Override

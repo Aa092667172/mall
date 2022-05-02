@@ -1,6 +1,7 @@
 package com.kevin.mall.controller;
 
 import com.kevin.mall.constant.ProductCategory;
+import com.kevin.mall.dto.ProductQueryParams;
 import com.kevin.mall.dto.ProductRequest;
 import com.kevin.mall.model.Product;
 import com.kevin.mall.service.ProductService;
@@ -24,7 +25,12 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<List<Product>>getProduct(@RequestParam(required = false) ProductCategory category,
                                                    @RequestParam(required = false) String search){
-        List<Product> list = productService.getProducts(category,search);
+        var productQueryParams = new ProductQueryParams();
+
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
+
+        List<Product> list = productService.getProducts(productQueryParams);
 
         return ResponseEntity.ok(list);
     }

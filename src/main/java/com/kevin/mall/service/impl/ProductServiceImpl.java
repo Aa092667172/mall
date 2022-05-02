@@ -2,6 +2,7 @@ package com.kevin.mall.service.impl;
 
 import com.kevin.mall.constant.ProductCategory;
 import com.kevin.mall.dao.ProductDao;
+import com.kevin.mall.dto.ProductQueryParams;
 import com.kevin.mall.dto.ProductRequest;
 import com.kevin.mall.model.Product;
 import com.kevin.mall.service.ProductService;
@@ -16,8 +17,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductDao productDao;
 
     @Override
-    public List<Product> getProducts(ProductCategory productCategory,String search) {
-        return productDao.getProducts(productCategory,search);
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+        return productDao.getProducts(productQueryParams);
     }
 
     @Override

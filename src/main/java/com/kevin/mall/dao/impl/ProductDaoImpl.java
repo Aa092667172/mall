@@ -2,6 +2,7 @@ package com.kevin.mall.dao.impl;
 
 import com.kevin.mall.constant.ProductCategory;
 import com.kevin.mall.dao.ProductDao;
+import com.kevin.mall.dto.ProductQueryParams;
 import com.kevin.mall.dto.ProductRequest;
 import com.kevin.mall.model.Product;
 import com.kevin.mall.rowmapper.ProductRowMapper;
@@ -20,24 +21,27 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<Product> getProducts(ProductCategory productCategory,String search) {
-        StringBuilder sqlBuilder = new StringBuilder("select product_id,product_name, category, image_url, price, stock," +
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+        var sqlBuilder = new StringBuilder("select product_id,product_name, category, image_url, price, stock," +
                 " description, created_date, last_modified_date " +
                 "from product where 1 = 1 ");
 
         Map<String, Object> map = new HashMap<>();
 
-        if(Objects.nonNull(productCategory)){
+        var category = productQueryParams.getCategory();
+        var search = productQueryParams.getSearch();
+
+        if (Objects.nonNull(category)) {
             sqlBuilder.append(" and category = :category ");
-            map.put("category",productCategory.name());
+            map.put("category", category.name());
         }
 
-        if(Objects.nonNull(search)){
+        if (Objects.nonNull(search)) {
             sqlBuilder.append(" and product_name like :search ");
-            map.put("search","%"+search+"%");
+            map.put("search", "%" + search + "%");
         }
 
-        return namedParameterJdbcTemplate.query(sqlBuilder.toString(), map,new ProductRowMapper());
+        return namedParameterJdbcTemplate.query(sqlBuilder.toString(), map, new ProductRowMapper());
     }
 
     @Override
@@ -81,6 +85,7 @@ public class ProductDaoImpl implements ProductDao {
                 " where product_id = :productId ";
 
         Map<String, Object> map = new HashMap<>();
+        
         map.put("productId", productId);
 
         map.put("productName", productRequest.getProductName());
@@ -91,14 +96,14 @@ public class ProductDaoImpl implements ProductDao {
         map.put("description", productRequest.getDescription());
         map.put("lastModifiedDate", new Date());
 
-        namedParameterJdbcTemplate.update(sql,map);
+        namedParameterJdbcTemplate.update(sql, map);
     }
 
     @Override
     public void deleteProduct(Integer productId) {
         String sql = "delete from product where product_id= :productId ";
-        Map<String,Object> map = new HashMap<>();
-        map.put("productId",productId);
-        namedParameterJdbcTemplate.update(sql,map);
+        Map<String, Object> map = new HashMap<>();
+        map.put("productId", productId);
+        namedParameterJdbcTemplate.update(sql, map);
     }
 }

@@ -1,6 +1,5 @@
 package com.kevin.mall.dao.impl;
 
-import com.kevin.mall.constant.ProductCategory;
 import com.kevin.mall.dao.ProductDao;
 import com.kevin.mall.dto.ProductQueryParams;
 import com.kevin.mall.dto.ProductRequest;
@@ -22,26 +21,15 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Integer countProduct(ProductQueryParams productQueryParams) {
-        var sqlBuilder = new StringBuilder("select count(*) " +
-                " from product where 1 = 1 ");
 
         Map<String, Object> map = new HashMap<>();
 
-        var category = productQueryParams.getCategory();
-        var search = productQueryParams.getSearch();
+        String sqlBuilder = "select count(*) " +
+                " from product where 1 = 1 " +
+                addFilteringSql(map, productQueryParams);
 
-
-        if (Objects.nonNull(category)) {
-            sqlBuilder.append(" and category = :category ");
-            map.put("category", category.name());
-        }
-
-        if (Objects.nonNull(search)) {
-            sqlBuilder.append(" and product_name like :search ");
-            map.put("search", "%" + search + "%");
-        }
         return namedParameterJdbcTemplate
-                .queryForObject(sqlBuilder.toString(), map, Integer.class);
+                .queryForObject(sqlBuilder, map, Integer.class);
     }
 
     @Override
@@ -52,20 +40,10 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        var category = productQueryParams.getCategory();
-        var search = productQueryParams.getSearch();
+        sqlBuilder.append(addFilteringSql(map, productQueryParams));
+
         var orderBy = productQueryParams.getOrderBy();
         var sort = productQueryParams.getSort();
-
-        if (Objects.nonNull(category)) {
-            sqlBuilder.append(" and category = :category ");
-            map.put("category", category.name());
-        }
-
-        if (Objects.nonNull(search)) {
-            sqlBuilder.append(" and product_name like :search ");
-            map.put("search", "%" + search + "%");
-        }
 
         sqlBuilder.append(" order by ")
                 .append(orderBy)
@@ -143,5 +121,22 @@ public class ProductDaoImpl implements ProductDao {
         Map<String, Object> map = new HashMap<>();
         map.put("productId", productId);
         namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    private StringBuilder addFilteringSql(Map<String, Object> map, ProductQueryParams productQueryParams) {
+        var appendSql = new StringBuilder();
+        var category = productQueryParams.getCategory();
+        var search = productQueryParams.getSearch();
+
+        if (Objects.nonNull(category)) {
+            appendSql.append(" and category = :category ");
+            map.put("category", category.name());
+        }
+
+        if (Objects.nonNull(search)) {
+            appendSql.append(" and product_name like :search ");
+            map.put("search", "%" + search + "%");
+        }
+        return appendSql;
     }
 }

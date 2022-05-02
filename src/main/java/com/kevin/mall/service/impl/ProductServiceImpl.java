@@ -1,6 +1,5 @@
 package com.kevin.mall.service.impl;
 
-import com.kevin.mall.constant.ProductCategory;
 import com.kevin.mall.dao.ProductDao;
 import com.kevin.mall.dto.ProductQueryParams;
 import com.kevin.mall.dto.ProductRequest;

@@ -21,6 +21,30 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
+    public Integer countProduct(ProductQueryParams productQueryParams) {
+        var sqlBuilder = new StringBuilder("select count(*) " +
+                " from product where 1 = 1 ");
+
+        Map<String, Object> map = new HashMap<>();
+
+        var category = productQueryParams.getCategory();
+        var search = productQueryParams.getSearch();
+
+
+        if (Objects.nonNull(category)) {
+            sqlBuilder.append(" and category = :category ");
+            map.put("category", category.name());
+        }
+
+        if (Objects.nonNull(search)) {
+            sqlBuilder.append(" and product_name like :search ");
+            map.put("search", "%" + search + "%");
+        }
+        return namedParameterJdbcTemplate
+                .queryForObject(sqlBuilder.toString(), map, Integer.class);
+    }
+
+    @Override
     public List<Product> getProducts(ProductQueryParams productQueryParams) {
         var sqlBuilder = new StringBuilder("select product_id,product_name, category, image_url, price, stock," +
                 " description, created_date, last_modified_date " +
@@ -47,6 +71,11 @@ public class ProductDaoImpl implements ProductDao {
                 .append(orderBy)
                 .append(" ")
                 .append(sort);
+
+        sqlBuilder.append(" limit :limit offset :offset ");
+
+        map.put("limit", productQueryParams.getLimit());
+        map.put("offset", productQueryParams.getOffset());
 
         return namedParameterJdbcTemplate.query(sqlBuilder.toString(), map, new ProductRowMapper());
     }
@@ -82,7 +111,9 @@ public class ProductDaoImpl implements ProductDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(map), keyHolder);
 
-        return keyHolder.getKey().intValue();
+        return Optional.ofNullable(keyHolder.getKey())
+                .map(Number::intValue)
+                .orElse(0);
     }
 
     @Override

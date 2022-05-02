@@ -30,6 +30,8 @@ public class ProductDaoImpl implements ProductDao {
 
         var category = productQueryParams.getCategory();
         var search = productQueryParams.getSearch();
+        var orderBy = productQueryParams.getOrderBy();
+        var sort = productQueryParams.getSort();
 
         if (Objects.nonNull(category)) {
             sqlBuilder.append(" and category = :category ");
@@ -40,6 +42,11 @@ public class ProductDaoImpl implements ProductDao {
             sqlBuilder.append(" and product_name like :search ");
             map.put("search", "%" + search + "%");
         }
+
+        sqlBuilder.append(" order by ")
+                .append(orderBy)
+                .append(" ")
+                .append(sort);
 
         return namedParameterJdbcTemplate.query(sqlBuilder.toString(), map, new ProductRowMapper());
     }
@@ -85,7 +92,7 @@ public class ProductDaoImpl implements ProductDao {
                 " where product_id = :productId ";
 
         Map<String, Object> map = new HashMap<>();
-        
+
         map.put("productId", productId);
 
         map.put("productName", productRequest.getProductName());

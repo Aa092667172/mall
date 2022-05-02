@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,11 +20,18 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>>getProduct(){
+        List<Product> list = productService.getProducts();
+
+        return ResponseEntity.ok(list);
+    }
+
     @GetMapping("/products/{productId}")
     public ResponseEntity<Product> getProduct(@PathVariable Integer productId) {
         Product product = productService.getProductById(productId);
         return Optional.ofNullable(product)
-                .map(status(HttpStatus.OK)::body)
+                .map(ResponseEntity::ok)
                 .orElse(status(HttpStatus.NOT_FOUND).build());
     }
     @PostMapping("/products")
@@ -45,7 +53,7 @@ public class ProductController {
 
         Product updateProduct = productService.getProductById(productId);
 
-        return status(HttpStatus.OK).body(updateProduct);
+        return ok(updateProduct);
     }
 
     @DeleteMapping("/products/{productId}")

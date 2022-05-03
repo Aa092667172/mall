@@ -7,11 +7,13 @@ import com.kevin.mall.model.Product;
 import com.kevin.mall.service.ProductService;
 import com.kevin.mall.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -24,7 +26,9 @@ import static org.springframework.http.ResponseEntity.*;
 //@Max @Min才會生效
 @Validated
 @RestController
+@CrossOrigin("http://localhost:8080/")
 public class ProductController {
+
     @Autowired
     private ProductService productService;
 

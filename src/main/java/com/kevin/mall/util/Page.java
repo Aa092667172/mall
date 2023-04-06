@@ -1,10 +1,16 @@
 package com.kevin.mall.util;
 
-import java.util.List;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+@ApiModel(description = "用於裝載分頁商品資料容器",value = "分頁物件")
 public class Page<T> {
+    @ApiModelProperty(value = "分頁資料",example="5")
     private Integer limit;
+    @ApiModelProperty(value = "跳過幾筆",example="0")
     private Integer offset;
+    @ApiModelProperty(value = "筆數總額",example="10")
     private Integer total;
     private List<T> results;
 
